@@ -3,7 +3,7 @@ var time = 0;
 var globalbombnum = 0;
 var globalgridsize = [9,9];
 
-var minesclicked;
+
 
 function buildGrid(difficulty) {
     //Set default difficulty
@@ -21,6 +21,7 @@ function buildGrid(difficulty) {
         for (var x = 0; x < columns; x++) {
             tile = createTile(x,y);
             grid.appendChild(tile);
+            tile.setAttribute("data-isMine","false")
             
         }
     }
@@ -41,9 +42,13 @@ function buildGrid(difficulty) {
     for (var i = 0; i < globalbombnum; i++) {
         var bombIndex = Math.floor(Math.random() * (columns*rows))
         //tiles[bombIndex].classList.add("mine")
-        if (tiles[bombIndex].classList.contains("mine") ){
+        //if (tiles[bombIndex].classList.contains("mine") ){
+        if (checkIfMine(tiles[bombIndex]) ){
+            console.log(checkIfMine(tiles[bombIndex]));
         } else { 
+
             tiles[bombIndex].classList.add("mine");
+            tiles[bombIndex].setAttribute("data-isMine","true")
             //tiles[bombIndex].style.visibility = "hidden";
             //tiles[bombIndex].classList.add("hidden");
         }
@@ -97,7 +102,10 @@ function checkIfStringDoesNotEqualMine(str){
 
 }
 
-
+function checkIfMine(tile){
+    let mineValue = tile.getAttribute("data-isMine");
+    return (mineValue === "true");
+}
 
 
 function startGame() {
