@@ -6,7 +6,8 @@ var globalgridsize = [9,9];
 var minesclicked;
 
 function buildGrid(difficulty) {
-
+    //Set default difficulty
+    setDifficulty();
     // Fetch grid and clear out old elements.
     var grid = document.getElementById("minefield");
     grid.innerHTML = "";
