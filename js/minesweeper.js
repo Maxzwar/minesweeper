@@ -34,55 +34,64 @@ function buildGrid(difficulty) {
     grid.style.width = (columns * width) + "px";
     grid.style.height = (rows * height) + "px";
 
-    //console.log(grid.childNodes);
     var tiles = grid.childNodes;
 
     //place mines
-   
     for (var i = 0; i < globalbombnum; i++) {
         var bombIndex = Math.floor(Math.random() * (columns*rows))
         
-        //if (tiles[bombIndex].classList.contains("mine") ){
+
         if (checkIfMine(tiles[bombIndex]) ){
-            //console.log(checkIfMine(tiles[bombIndex]));
+ 
         } else { 
             tiles[bombIndex].setAttribute("data-isMine","true")
-            tiles[bombIndex].classList.add("mine")
-            //tiles[bombIndex].style.visibility = "hidden";
-            //tiles[bombIndex].classList.add("hidden");
+
         }
         
     }
 
     
-    // calculate bombs
+    // calculate bombs surrounding each tile
     for (let i = 0; i < tiles.length; i++) {
-        let total = 0
-        let test = ""//string to test edges and first square detection
+        let sum = 0
+        
         let width = globalgridsize[0];
         let end = tiles.length;
-        const leftEdge = (i % width === 0);
-        const rightEdge = (i % width === width-1);
-        //if (!tiles[i].classList.contains('mine')) {
+        const farLeftCol = (i % width === 0);
+        const farRightCol = (i % width === width-1);
+
         // check no mine
         if  (!checkIfMine(tiles[i])) {
-            //west
-            if (i > 0 && !leftEdge && checkIfMine(tiles[i -1])) {total++; test +="w "}
-            //
-            if (i > width && !rightEdge && checkIfMine(tiles[i +1-width])) total++
-            if (i > width+1 && checkIfMine(tiles[i - width])) total++
-            if(i > width+2 && !leftEdge && checkIfMine(tiles[i -1 -width])) total ++
-            if(i < end-1 && !rightEdge && checkIfMine(tiles[i +1])) total++
-            if (i < end-width && !leftEdge && checkIfMine(tiles[i -1 +width])) total++
-            if(i<(end-width-1) && !rightEdge && checkIfMine(tiles[i+1+width])) total++
-            if(i <end-width && checkIfMine(tiles[i + width])) total++
-            tiles[i].setAttribute('data-count', total);
-            console.log(test);
+
+            // Check previous tile 
+            if (i > 0 && !farLeftCol && checkIfMine(tiles[i -1])) {sum++;}
+
+            // Check top right corner
+            if (i > width && !farRightCol && checkIfMine(tiles[i +1 -width])) sum++
+            
+            // Check above tile
+            if (i > (width) && checkIfMine(tiles[i - width])) sum++
+
+            //Check top left corner
+            if(i > (width+2) &&  !farLeftCol && checkIfMine(tiles[i -1 -width])) sum ++
+
+            //Check right
+            if(i < (end-1) && !farRightCol && checkIfMine(tiles[i +1])) sum++
+            
+            //Check  bottom left corner
+            if (i < (end-width) && !farLeftCol && checkIfMine(tiles[i -1 +width])) sum++
+            
+            //Check bottom right corner
+            if(i<(end-width-1) && !farRightCol && checkIfMine(tiles[i +1 +width])) sum++
+            
+            //Check below
+            if(i <(end-width) && checkIfMine(tiles[i + width])) sum++
+            
+            tiles[i].setAttribute('data-count', sum);
             
             
             
         } else{
-            //console.log("bomb")
         }
         
     }
@@ -171,42 +180,6 @@ function handleTileClick(event) {
                 else if(minesnear==8){
                     tile.classList.add("tile_8")
                 }
-                // switch(total){
-                //     case 1: 
-                //         tile.classList.add("tile_1");
-                //         tile.classList.remove("hidden");
-                //         break;
-                //     case 2: 
-                //         tile.classList.add("tile_2")
-                //         tile.classList.remove("hidden");
-                //         break;
-                //     case 3: 
-                //         tile.classList.add("tile_3")
-                //         tile.classList.remove("hidden");
-                //         break;
-                //     case 4: 
-                //         tile.classList.add("tile_4")
-                //         tile.classList.remove("hidden");
-                //         break;
-                //     case 5: 
-                //         tile.classList.add("tile_5")
-                //         tile.classList.remove("hidden");
-                //         break;
-                //     case 6: 
-                //         tile.classList.add("tile_6")
-                //         tile.classList.remove("hidden");
-                //         break;
-                //     case 7: 
-                //         tile.classList.add("tile_7")
-                //         tile.classList.remove("hidden");
-                //         break;
-                //     case 8: 
-                //         tile.classList.add("tile_8")
-                //         tile.classList.remove("hidden");
-                //         break;
-                //     default:
-                //         break;
-                // }
             } 
             else {
                 tile.classList.remove("hidden");
