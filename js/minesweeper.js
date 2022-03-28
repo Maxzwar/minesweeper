@@ -1,8 +1,8 @@
 
 var time = 0;
-var globalbombnum = 0;
-var globalgridsize = [9,9];
-
+var globalMineNum = 0;
+var globalGridSize = [9,9];
+var clicks = 0;
 
 
 function buildGrid(difficulty) {
@@ -12,8 +12,8 @@ function buildGrid(difficulty) {
     var grid = document.getElementById("minefield");
     grid.innerHTML = "";
 
-    var columns = globalgridsize[0];
-    var rows = globalgridsize[1];
+    var columns = globalGridSize[0];
+    var rows = globalGridSize[1];
 
     // Build DOM Grid
     var tile;
@@ -37,80 +37,41 @@ function buildGrid(difficulty) {
     var tiles = grid.childNodes;
 
     //place mines
-    placeMines(tiles, globalbombnum);
-    // var remainingBombs = globalbombnum;
-    // do {
-    //     var bombIndex = Math.floor(Math.random() * (columns*rows))
-        
-
-    //     if (checkIfMine(tiles[bombIndex]) ){
- 
-    //     } else { 
-    //         tiles[bombIndex].setAttribute("data-isMine","true")
-    //         remainingBombs --;
-    //     }
-
-    // }
-    // while (remainingBombs >0);
-    // for (var i = 0; i < globalbombnum; i++) {
-    //     var bombIndex = Math.floor(Math.random() * (columns*rows))
-        
-
-    //     if (checkIfMine(tiles[bombIndex]) ){
- 
-    //     } else { 
-    //         tiles[bombIndex].setAttribute("data-isMine","true")
-
-    //     }
-        
-    // }
+    placeMines(tiles, globalMineNum);
 
     
-    // calculate bombs surrounding each tile
+    // calculate mines surrounding each tile
     for (let i = 0; i < tiles.length; i++) {
         let sum = 0
         
-        let width = globalgridsize[0];
+        let width = globalGridSize[0];
         let end = tiles.length;
         const farLeftCol = (i % width === 0);
         const farRightCol = (i % width === width-1);
 
         // check no mine
         if  (!checkIfMine(tiles[i])) {
-
             // Check previous tile 
             if (i > 0 && !farLeftCol && checkIfMine(tiles[i -1])) {sum++;}
-
             // Check top right corner
             if (i > width && !farRightCol && checkIfMine(tiles[i +1 -width])) sum++
-            
             // Check above tile
             if (i > (width) && checkIfMine(tiles[i - width])) sum++
-
             //Check top left corner
             if(i > (width+2) &&  !farLeftCol && checkIfMine(tiles[i -1 -width])) sum ++
-
             //Check right
             if(i < (end-1) && !farRightCol && checkIfMine(tiles[i +1])) sum++
-            
             //Check  bottom left corner
             if (i < (end-width) && !farLeftCol && checkIfMine(tiles[i -1 +width])) sum++
-            
             //Check bottom right corner
             if(i<(end-width-1) && !farRightCol && checkIfMine(tiles[i +1 +width])) sum++
-            
             //Check below
             if(i <(end-width) && checkIfMine(tiles[i + width])) sum++
-            
             tiles[i].setAttribute('data-count', sum);
-            
-            
-            
-        } else{
-        }
+        } else{}
         
     }
-    console.log(grid);
+    //console.log(grid);
 }
 
 function createTile(x,y) {
@@ -126,33 +87,28 @@ function createTile(x,y) {
     return tile;
 }
 
-function checkIfStringDoesNotEqualMine(str){
-    return str!="mine";
-
-}
-
 function checkIfMine(tile){
     let mineValue = tile.getAttribute("data-isMine");
     return (mineValue === "true");
 }
 
-function placeMines(bombGrid, numBombs) {
-    var remainingBombs = numBombs;
-    let columns = globalgridsize[0];
-    let rows = globalgridsize[1];
+function placeMines(tiles, numMines) {
+    var remainingMines = numMines;
+    let columns = globalGridSize[0];
+    let rows = globalGridSize[1];
     do {
-        var bombIndex = Math.floor(Math.random() * (columns*rows))
+        var mineIndex = Math.floor(Math.random() * (columns*rows))
         
 
-        if (checkIfMine(bombGrid[bombIndex]) ){
+        if (checkIfMine(tiles[mineIndex]) ){
  
         } else { 
-            bombGrid[bombIndex].setAttribute("data-isMine","true")
-            remainingBombs --;
+            tiles[mineIndex].setAttribute("data-isMine","true")
+            remainingMines --;
         }
 
     }
-    while (remainingBombs >0);
+    while (remainingMines >0);
 }
 
 
@@ -187,31 +143,31 @@ function handleTileClick(event) {
         }
         else {
             console.log(tile);
-            let minesnear = tile.getAttribute("data-count")
-            console.log(minesnear);
-            if (minesnear !=0) {
-                if(minesnear==1){
+            let minesNear = tile.getAttribute("data-count")
+            console.log(minesNear);
+            if (minesNear !=0) {
+                if(minesNear==1){
                     tile.classList.add("tile_1");
                 }
-                else if(minesnear==2){
+                else if(minesNear==2){
                     tile.classList.add("tile_2")
                 }
-                else if(minesnear==3){
+                else if(minesNear==3){
                     tile.classList.add("tile_3")
                 }
-                else if(minesnear==4){
+                else if(minesNear==4){
                     tile.classList.add("tile_4")
                 }
-                else if(minesnear==5){
+                else if(minesNear==5){
                     tile.classList.add("tile_5")
                 }
-                else if(minesnear==6){
+                else if(minesNear==6){
                     tile.classList.add("tile_6")
                 }
-                else if(minesnear==7){
+                else if(minesNear==7){
                     tile.classList.add("tile_7")
                 }
-                else if(minesnear==8){
+                else if(minesNear==8){
                     tile.classList.add("tile_8")
                 }
             } 
@@ -238,25 +194,25 @@ function setDifficulty() {
     // alert(difficulty);
     switch(difficulty) {
         case 0:
-            globalgridsize =[9,9];
-            globalbombnum = 10;
-            //bombcount = globalgridsize;
-            console.log(globalbombnum);
+            globalGridSize =[9,9];
+            globalMineNum = 10;
+            //minecount = globalGridSize;
+            console.log(globalMineNum);
             break;
         case 1:
-            globalgridsize = [16,16];
-            globalbombnum = 40;
-            //bombcount = globalgridsize;
+            globalGridSize = [16,16];
+            globalMineNum = 40;
+            //minecount = globalGridSize;
             break;
         case 2:
-            globalgridsize = [30,16];
-            globalbombnum = 99;
-            //bombcount = globalgridsize;
+            globalGridSize = [30,16];
+            globalMineNum = 99;
+            //minecount = globalGridSize;
             break;
         default:
-            globalgridsize =[9,9];
-            globalbombnum = 10;
-            //bombcount = globalgridsize;
+            globalGridSize =[9,9];
+            globalMineNum = 10;
+            //minecount = globalGridSize;
     }
     //TODO implement me
 }
