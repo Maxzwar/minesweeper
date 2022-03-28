@@ -37,18 +37,33 @@ function buildGrid(difficulty) {
     var tiles = grid.childNodes;
 
     //place mines
-    for (var i = 0; i < globalbombnum; i++) {
-        var bombIndex = Math.floor(Math.random() * (columns*rows))
+    placeMines(tiles, globalbombnum);
+    // var remainingBombs = globalbombnum;
+    // do {
+    //     var bombIndex = Math.floor(Math.random() * (columns*rows))
         
 
-        if (checkIfMine(tiles[bombIndex]) ){
+    //     if (checkIfMine(tiles[bombIndex]) ){
  
-        } else { 
-            tiles[bombIndex].setAttribute("data-isMine","true")
+    //     } else { 
+    //         tiles[bombIndex].setAttribute("data-isMine","true")
+    //         remainingBombs --;
+    //     }
 
-        }
+    // }
+    // while (remainingBombs >0);
+    // for (var i = 0; i < globalbombnum; i++) {
+    //     var bombIndex = Math.floor(Math.random() * (columns*rows))
         
-    }
+
+    //     if (checkIfMine(tiles[bombIndex]) ){
+ 
+    //     } else { 
+    //         tiles[bombIndex].setAttribute("data-isMine","true")
+
+    //     }
+        
+    // }
 
     
     // calculate bombs surrounding each tile
@@ -119,6 +134,25 @@ function checkIfStringDoesNotEqualMine(str){
 function checkIfMine(tile){
     let mineValue = tile.getAttribute("data-isMine");
     return (mineValue === "true");
+}
+
+function placeMines(bombGrid, numBombs) {
+    var remainingBombs = numBombs;
+    let columns = globalgridsize[0];
+    let rows = globalgridsize[1];
+    do {
+        var bombIndex = Math.floor(Math.random() * (columns*rows))
+        
+
+        if (checkIfMine(bombGrid[bombIndex]) ){
+ 
+        } else { 
+            bombGrid[bombIndex].setAttribute("data-isMine","true")
+            remainingBombs --;
+        }
+
+    }
+    while (remainingBombs >0);
 }
 
 
