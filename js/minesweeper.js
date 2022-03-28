@@ -130,7 +130,8 @@ function handleTileClick(event) {
     
     if (event.which === 1) {
         //TODO reveal the tile
-        if (tile.classList.contains("mine")){
+        //if (tile.classList.contains("mine")){
+        if (checkIfMine(tile)){
             alert("game over");
             let smiley = document.getElementById("smiley")
             smiley.classList.add("face_lose");
