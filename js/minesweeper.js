@@ -41,14 +41,13 @@ function buildGrid(difficulty) {
    
     for (var i = 0; i < globalbombnum; i++) {
         var bombIndex = Math.floor(Math.random() * (columns*rows))
-        //tiles[bombIndex].classList.add("mine")
+        
         //if (tiles[bombIndex].classList.contains("mine") ){
         if (checkIfMine(tiles[bombIndex]) ){
-            console.log(checkIfMine(tiles[bombIndex]));
+            //console.log(checkIfMine(tiles[bombIndex]));
         } else { 
-
-            tiles[bombIndex].classList.add("mine");
             tiles[bombIndex].setAttribute("data-isMine","true")
+            tiles[bombIndex].classList.add("mine")
             //tiles[bombIndex].style.visibility = "hidden";
             //tiles[bombIndex].classList.add("hidden");
         }
@@ -63,15 +62,18 @@ function buildGrid(difficulty) {
         let end = tiles.length;
         const leftEdge = i % width == 0;
         const rightEdge = i === width-1;
-        if (!tiles[i].classList.contains('mine')) {
-            if (i > 0 && !leftEdge && tiles[i-1].classList.contains("mine")) total++
-            if (i > width && !rightEdge && tiles[i+1-width].classList.contains("mine")) total++
-            if (i > width+1 && tiles[i - width].classList.contains("mine")) total++
-            if(i > width+2 && !leftEdge && tiles[i-1-width].classList.contains("mine")) total ++
-            if(i < end-1 && !rightEdge && tiles[i+1].classList.contains("mine")) total++
-            if (i < end-width && !leftEdge && tiles[i -1+width].classList.contains("mine")) total++
-            if(i<(end-width-1) && !rightEdge && tiles[i+1+width].classList.contains("mine")) total++
-            if(i <end-width && tiles[i + width].classList.contains("mine")) total++
+        //if (!tiles[i].classList.contains('mine')) {
+        // check no mine
+        if  (!checkIfMine(tiles[i])) {
+            //
+            if (i > 0 && !leftEdge && checkIfMine(tiles[i -1])) total++
+            if (i > width && !rightEdge && checkIfMine(tiles[i +1-width])) total++
+            if (i > width+1 && checkIfMine(tiles[i - width])) total++
+            if(i > width+2 && !leftEdge && checkIfMine(tiles[i -1 -width])) total ++
+            if(i < end-1 && !rightEdge && checkIfMine(tiles[i +1])) total++
+            if (i < end-width && !leftEdge && checkIfMine(tiles[i -1 +width])) total++
+            if(i<(end-width-1) && !rightEdge && checkIfMine(tiles[i+1+width])) total++
+            if(i <end-width && checkIfMine(tiles[i + width])) total++
             tiles[i].setAttribute('data-count', total);
             
             
@@ -130,8 +132,8 @@ function handleTileClick(event) {
     
     if (event.which === 1) {
         //TODO reveal the tile
-        //if (tile.classList.contains("mine")){
         if (checkIfMine(tile)){
+            tile.classList.add("mine");
             alert("game over");
             let smiley = document.getElementById("smiley")
             smiley.classList.add("face_lose");
