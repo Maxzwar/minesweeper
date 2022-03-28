@@ -58,15 +58,17 @@ function buildGrid(difficulty) {
     // calculate bombs
     for (let i = 0; i < tiles.length; i++) {
         let total = 0
+        let test = ""//string to test edges and first square detection
         let width = globalgridsize[0];
         let end = tiles.length;
-        const leftEdge = i % width == 0;
-        const rightEdge = i === width-1;
+        const leftEdge = (i % width === 0);
+        const rightEdge = (i % width === width-1);
         //if (!tiles[i].classList.contains('mine')) {
         // check no mine
         if  (!checkIfMine(tiles[i])) {
+            //west
+            if (i > 0 && !leftEdge && checkIfMine(tiles[i -1])) {total++; test +="w "}
             //
-            if (i > 0 && !leftEdge && checkIfMine(tiles[i -1])) total++
             if (i > width && !rightEdge && checkIfMine(tiles[i +1-width])) total++
             if (i > width+1 && checkIfMine(tiles[i - width])) total++
             if(i > width+2 && !leftEdge && checkIfMine(tiles[i -1 -width])) total ++
@@ -75,6 +77,7 @@ function buildGrid(difficulty) {
             if(i<(end-width-1) && !rightEdge && checkIfMine(tiles[i+1+width])) total++
             if(i <end-width && checkIfMine(tiles[i + width])) total++
             tiles[i].setAttribute('data-count', total);
+            console.log(test);
             
             
             
