@@ -23,6 +23,7 @@ function buildGrid(difficulty) {
             grid.appendChild(tile);
             tile.setAttribute("data-isMine","false")
             
+            
         }
     }
     
@@ -39,39 +40,9 @@ function buildGrid(difficulty) {
     //place mines
     placeMines(tiles, globalMineNum);
 
-    
-    // Calculate mines surrounding each tile
     for (let i = 0; i < tiles.length; i++) {
-        let sum = 0
-        
-        let width = globalGridSize[0];
-        let end = tiles.length;
-        const farLeftCol = (i % width === 0);
-        const farRightCol = (i % width === width-1);
-
-        // check no mine
-        if  (!checkIfMine(tiles[i])) {
-            // Check previous tile 
-            if (i > 0 && !farLeftCol && checkIfMine(tiles[i -1])) {sum++;}
-            // Check top right corner
-            if (i > width && !farRightCol && checkIfMine(tiles[i +1 -width])) sum++
-            // Check above tile
-            if (i > (width) && checkIfMine(tiles[i - width])) sum++
-            //Check top left corner
-            if(i > (width+2) &&  !farLeftCol && checkIfMine(tiles[i -1 -width])) sum ++
-            //Check right
-            if(i < (end-1) && !farRightCol && checkIfMine(tiles[i +1])) sum++
-            //Check  bottom left corner
-            if (i < (end-width) && !farLeftCol && checkIfMine(tiles[i -1 +width])) sum++
-            //Check bottom right corner
-            if(i<(end-width-1) && !farRightCol && checkIfMine(tiles[i +1 +width])) sum++
-            //Check below
-            if(i <(end-width) && checkIfMine(tiles[i + width])) sum++
-            tiles[i].setAttribute('data-count', sum);
-        } else{}
-        
+        calculateMinesAround(i);
     }
-    //console.log(grid);
 }
 
 function createTile(x,y) {
@@ -112,38 +83,39 @@ function placeMines(tiles, numMines) {
     return tiles;
 }
 
-function calculateMine(tiles) {
-    for (let i = 0; i < tiles.length; i++) {
-        let sum = 0
-        
-        let width = globalGridSize[0];
-        let end = tiles.length;
-        const farLeftCol = (i % width === 0);
-        const farRightCol = (i % width === width-1);
-
-        // check no mine
-        if  (!checkIfMine(tiles[i])) {
-            // Check previous tile 
-            if (i > 0 && !farLeftCol && checkIfMine(tiles[i -1])) {sum++;}
-            // Check top right corner
-            if (i > width && !farRightCol && checkIfMine(tiles[i +1 -width])) sum++
-            // Check above tile
-            if (i > (width) && checkIfMine(tiles[i - width])) sum++
-            //Check top left corner
-            if(i > (width+2) &&  !farLeftCol && checkIfMine(tiles[i -1 -width])) sum ++
-            //Check right
-            if(i < (end-1) && !farRightCol && checkIfMine(tiles[i +1])) sum++
-            //Check  bottom left corner
-            if (i < (end-width) && !farLeftCol && checkIfMine(tiles[i -1 +width])) sum++
-            //Check bottom right corner
-            if(i<(end-width-1) && !farRightCol && checkIfMine(tiles[i +1 +width])) sum++
-            //Check below
-            if(i <(end-width) && checkIfMine(tiles[i + width])) sum++
-            tiles[i].setAttribute('data-count', sum);
-        } else{}
-        return tiles;
-    }
+// Parameter i: the index of the tile in the nodelist
+function calculateMinesAround(i) {
+    //This works to get the main grid!
+    //let tiles  = document.getElementById("minefield").childNodes;
+    let grid  = document.getElementById("minefield");
+    let tiles = grid.childNodes;
+    // i is the index of the child in the parent
+    let sum = 0
+    
+    let width = globalGridSize[0];
+    let end = tiles.length;
+    const farLeftCol = (i % width === 0);
+    const farRightCol = (i % width === width-1);
+    // Check previous tile 
+    if (i > 0 && !farLeftCol && checkIfMine(tiles[i -1])) {sum++;}
+    // Check top right corner
+    if (i > width && !farRightCol && checkIfMine(tiles[i +1 -width])) sum++
+    // Check above tile
+    if (i > (width) && checkIfMine(tiles[i - width])) sum++
+    //Check top left corner
+    if(i > (width+2) &&  !farLeftCol && checkIfMine(tiles[i -1 -width])) sum ++
+    //Check right
+    if(i < (end-1) && !farRightCol && checkIfMine(tiles[i +1])) sum++
+    //Check  bottom left corner
+    if (i < (end-width) && !farLeftCol && checkIfMine(tiles[i -1 +width])) sum++
+    //Check bottom right corner
+    if(i<(end-width-1) && !farRightCol && checkIfMine(tiles[i +1 +width])) sum++
+    //Check below
+    if(i <(end-width) && checkIfMine(tiles[i + width])) sum++
+    tiles[i].setAttribute('data-count', sum);
+    return sum;
 }
+
 
 
 function startGame() {
@@ -163,21 +135,21 @@ function smileyUp() {
 
 
 function handleTileClick(event) {
+    var tile = event.target;
+    var tiles = document.getElementById("minefield").childNodes;
     
-    tile = event.target;
-    
-
-    
-
     // Left Click
     if (event.which === 1) {
+        // No lose first click
         if(clicks == 0 && checkIfMine(tile)){
-            tile.setAttribute("data-ismine","false");
-            calculateMines(tile);
+            tile.setAttribute("data-isMine","false");
+            tile.classList.remove("hidden");
+            setTileCountClass(tile);
+            placeMines(tiles,1);
             
         }
         clicks++;
-        //TODO reveal the tile
+        // Game over
         if (checkIfMine(tile)){
             tile.classList.add("mine");
             alert("game over");
@@ -185,49 +157,60 @@ function handleTileClick(event) {
             smiley.classList.add("face_lose");
             
         }
-        else {
-            console.log(tile);
-            let minesNear = tile.getAttribute("data-count")
-            console.log(minesNear);
-            if (minesNear !=0) {
-                if(minesNear==1){
-                    tile.classList.add("tile_1");
-                }
-                else if(minesNear==2){
-                    tile.classList.add("tile_2")
-                }
-                else if(minesNear==3){
-                    tile.classList.add("tile_3")
-                }
-                else if(minesNear==4){
-                    tile.classList.add("tile_4")
-                }
-                else if(minesNear==5){
-                    tile.classList.add("tile_5")
-                }
-                else if(minesNear==6){
-                    tile.classList.add("tile_6")
-                }
-                else if(minesNear==7){
-                    tile.classList.add("tile_7")
-                }
-                else if(minesNear==8){
-                    tile.classList.add("tile_8")
-                }
-            } 
-            else {
-                tile.classList.remove("hidden");
-            return;
-            }
+        // No mine
+        else { setTileCountClass(tile);
         }
     }
-    // Right Click
+    // Right Click to place flag
     else if (event.which === 3) { 
         //TODO toggle a tile flag
         //tile.classlist.remove("mine");
         tile.classList.toggle('mine_marked');
         
-    }
+    } 
+}
+
+function setTileCountClass(tile) {
+            let minesAround = tile.getAttribute("data-count")
+            console.log(minesAround);
+            if (minesAround !=0) {
+                if(minesAround==1){
+                    tile.classList.add("tile_1");
+                    return;
+                }
+                else if(minesAround==2){
+                    tile.classList.add("tile_2")
+                    return;
+                }
+                else if(minesAround==3){
+                    tile.classList.add("tile_3")
+                    return;
+                }
+                else if(minesAround==4){
+                    tile.classList.add("tile_4")
+                    return;
+                }
+                else if(minesAround==5){
+                    tile.classList.add("tile_5")
+                    return;
+                }
+                else if(minesAround==6){
+                    tile.classList.add("tile_6")
+                    return;
+                }
+                else if(minesAround==7){
+                    tile.classList.add("tile_7")
+                    return;
+                }
+                else if(minesAround==8){
+                    tile.classList.add("tile_8")
+                    return;
+                }
+            } 
+            else {
+                tile.classList.remove("hidden");
+                return;
+            }
 }
 
 function setDifficulty() {
