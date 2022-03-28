@@ -40,7 +40,7 @@ function buildGrid(difficulty) {
     placeMines(tiles, globalMineNum);
 
     
-    // calculate mines surrounding each tile
+    // Calculate mines surrounding each tile
     for (let i = 0; i < tiles.length; i++) {
         let sum = 0
         
@@ -109,6 +109,40 @@ function placeMines(tiles, numMines) {
 
     }
     while (remainingMines >0);
+    return tiles;
+}
+
+function calculateMine(tiles) {
+    for (let i = 0; i < tiles.length; i++) {
+        let sum = 0
+        
+        let width = globalGridSize[0];
+        let end = tiles.length;
+        const farLeftCol = (i % width === 0);
+        const farRightCol = (i % width === width-1);
+
+        // check no mine
+        if  (!checkIfMine(tiles[i])) {
+            // Check previous tile 
+            if (i > 0 && !farLeftCol && checkIfMine(tiles[i -1])) {sum++;}
+            // Check top right corner
+            if (i > width && !farRightCol && checkIfMine(tiles[i +1 -width])) sum++
+            // Check above tile
+            if (i > (width) && checkIfMine(tiles[i - width])) sum++
+            //Check top left corner
+            if(i > (width+2) &&  !farLeftCol && checkIfMine(tiles[i -1 -width])) sum ++
+            //Check right
+            if(i < (end-1) && !farRightCol && checkIfMine(tiles[i +1])) sum++
+            //Check  bottom left corner
+            if (i < (end-width) && !farLeftCol && checkIfMine(tiles[i -1 +width])) sum++
+            //Check bottom right corner
+            if(i<(end-width-1) && !farRightCol && checkIfMine(tiles[i +1 +width])) sum++
+            //Check below
+            if(i <(end-width) && checkIfMine(tiles[i + width])) sum++
+            tiles[i].setAttribute('data-count', sum);
+        } else{}
+        return tiles;
+    }
 }
 
 
@@ -129,10 +163,20 @@ function smileyUp() {
 
 
 function handleTileClick(event) {
-    // Left Click
+    
     tile = event.target;
     
+
+    
+
+    // Left Click
     if (event.which === 1) {
+        if(clicks == 0 && checkIfMine(tile)){
+            tile.setAttribute("data-ismine","false");
+            calculateMines(tile);
+            
+        }
+        clicks++;
         //TODO reveal the tile
         if (checkIfMine(tile)){
             tile.classList.add("mine");
@@ -180,9 +224,8 @@ function handleTileClick(event) {
     // Right Click
     else if (event.which === 3) { 
         //TODO toggle a tile flag
-        
         //tile.classlist.remove("mine");
-        tile.classList.add('mine_marked');
+        tile.classList.toggle('mine_marked');
         
     }
 }
