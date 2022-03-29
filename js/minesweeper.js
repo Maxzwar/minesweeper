@@ -85,6 +85,8 @@ function placeMines(tiles, numMines) {
 
 // Parameter i: the index of the tile in the nodelist
 function calculateMinesAround(i) {
+    //TODO: use isadjacent function to replace code block----------------------------------------------------------------- 
+
     //This works to get the main grid!
     //let tiles  = document.getElementById("minefield").childNodes;
     let grid  = document.getElementById("minefield");
@@ -149,7 +151,7 @@ function handleTileClick(event) {
             
         }
         clicks++;
-        // Game over
+        // Game over condition
         if (checkIfMine(tile)){
             tile.classList.add("mine");
             alert("game over");
@@ -157,8 +159,9 @@ function handleTileClick(event) {
             smiley.classList.add("face_lose");
             
         }
-        // No mine
+        // No mine, reveal adjacent
         else { setTileCountClass(tile);
+                   // TODO: use is adjacent and handleclick for recursion revealing all adjacent on naked tile
         }
     }
     // Right Click to place flag
@@ -168,6 +171,58 @@ function handleTileClick(event) {
         tile.classList.toggle('mine_marked');
         
     } 
+}
+
+function isAdjacent(mainIdx,questionIdx){ // parameter i: index of exploding tile in node list
+    // make parameters less verbose
+    let i = mainIdx;
+    let q = questionIdx;
+    //Load minefield
+    let grid  = document.getElementById("minefield");
+    let tiles = grid.childNodes;
+    // i is the index of the child in the parent
+    let width = globalGridSize[0];
+    let end = tiles.length;
+    const farLeftCol = (i % width === 0);
+    const farRightCol = (i % width === width-1);
+
+    // Check previous tile 
+    
+    if (i > 0 && !farLeftCol && (tiles[i -1])) {return true;}
+    // Check top right corner
+    else if (i > width && !farRightCol && checkIfMine(tiles[i +1 -width])) {return true;}
+    // Check above tile
+    else if (i > (width) && checkIfMine(tiles[i - width])){return true;}
+    //Check top left corner
+    else if(i > (width+2) &&  !farLeftCol && checkIfMine(tiles[i -1 -width])){return true;}
+    //Check right
+    else if(i < (end-1) && !farRightCol && checkIfMine(tiles[i +1])){return true;}
+    //Check  bottom left corner
+    else if (i < (end-width) && !farLeftCol && checkIfMine(tiles[i -1 +width])){return true;}
+    //Check bottom right corner
+    else if(i<(end-width-1) && !farRightCol && checkIfMine(tiles[i +1 +width])){return true;}
+    //Check below
+    else if(i <(end-width) && checkIfMine(tiles[i + width])){return true;}
+    
+    else {return false;}
+    //-------------------------------
+    // if (i > 0 && !farLeftCol && checkIfMine(tiles[i -1])) {return true;}
+    // // Check top right corner
+    // else if (i > width && !farRightCol && checkIfMine(tiles[i +1 -width])) {return true;}
+    // // Check above tile
+    // else if (i > (width) && checkIfMine(tiles[i - width])){return true;}
+    // //Check top left corner
+    // else if(i > (width+2) &&  !farLeftCol && checkIfMine(tiles[i -1 -width])){return true;}
+    // //Check right
+    // else if(i < (end-1) && !farRightCol && checkIfMine(tiles[i +1])){return true;}
+    // //Check  bottom left corner
+    // else if (i < (end-width) && !farLeftCol && checkIfMine(tiles[i -1 +width])){return true;}
+    // //Check bottom right corner
+    // else if(i<(end-width-1) && !farRightCol && checkIfMine(tiles[i +1 +width])){return true;}
+    // //Check below
+    // else if(i <(end-width) && checkIfMine(tiles[i + width])){return true;}
+    
+    // else {return false;}
 }
 
 function setTileCountClass(tile) {
