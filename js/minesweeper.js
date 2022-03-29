@@ -139,6 +139,7 @@ function smileyUp() {
 function handleTileClick(event) {
     var tile = event.target;
     var tiles = document.getElementById("minefield").childNodes;
+    var tileIdx = Array.from(tile.parentNode.children).indexOf(tile);
     
     // Left Click
     if (event.which === 1) {
@@ -160,12 +161,17 @@ function handleTileClick(event) {
             
         }
         // No mine, reveal adjacent
-        else { setTileCountClass(tile);
-                   // TODO: use is adjacent and handleclick for recursion revealing all adjacent on naked tile
+        else { 
+            setTileCountClass(tile);
+            var adjacents = getAdjacentIndices(tileIdx);
+            for (let iter = 0;iter<adjacents.length;iter++) {
+                tiles[adjacents[iter]].classList.toggle("hidden");
+            }
+
         }
     }
     // Right Click to place flag
-    else if (event.which === 3) { 
+    else if (event.which === 3) {
         //TODO toggle a tile flag
         //tile.classlist.remove("mine");
         tile.classList.toggle('mine_marked');
@@ -173,6 +179,36 @@ function handleTileClick(event) {
     } 
 }
 
+function getAdjacentIndices(i){
+    let adjArray = [];
+    
+    //Load minefield
+    let grid  = document.getElementById("minefield");
+    let tiles = grid.childNodes;
+    // i is the index of the child in the parent
+    let width = globalGridSize[0];
+    let end = tiles.length;
+    const farLeftCol = (i % width === 0);
+    const farRightCol = (i % width === width-1);
+
+    // Check previous tile 
+    if (i > 0 && !farLeftCol) {adjArray.push([i-1]);}
+    // Check top right corner
+    else if (i > width && !farRightCol) {adjArray.push([i +1 -width]);}
+    // Check above tile
+    else if (i > (width) ){adjArray.push([i - width]);}
+    //Check top left corner
+    else if(i > (width+2) &&  !farLeftCol){adjArray.push([i -1 -width]);}
+    //Check right
+    else if(i < (end-1) && !farRightCol){adjArray.push([i +1]);}
+    //Check  bottom left corner
+    else if (i < (end-width) && !farLeftCol){adjArray.push([i -1 +width]);}
+    //Check bottom right corner
+    else if(i<(end-width-1) && !farRightCol ){adjArray.push([i +1 +width]);}
+    //Check below
+    else if(i <(end-width)){adjArray.push([i + width]);}
+    return adjArray;
+}
 function isAdjacent(mainIdx,questionIdx){ // parameter i: index of exploding tile in node list
     // make parameters less verbose
     let i = mainIdx;
@@ -187,24 +223,24 @@ function isAdjacent(mainIdx,questionIdx){ // parameter i: index of exploding til
     const farRightCol = (i % width === width-1);
 
     // Check previous tile 
-    
     if (i > 0 && !farLeftCol && (tiles[i -1])) {return true;}
     // Check top right corner
-    else if (i > width && !farRightCol && checkIfMine(tiles[i +1 -width])) {return true;}
+    else if (i > width && !farRightCol && (q == (tiles[i +1 -width]))) {return true;}
     // Check above tile
-    else if (i > (width) && checkIfMine(tiles[i - width])){return true;}
+    else if (i > (width) && q == (tiles[i - width])){return true;}
     //Check top left corner
-    else if(i > (width+2) &&  !farLeftCol && checkIfMine(tiles[i -1 -width])){return true;}
+    else if(i > (width+2) &&  !farLeftCol && (q == (tiles[i -1 -width]))){return true;}
     //Check right
-    else if(i < (end-1) && !farRightCol && checkIfMine(tiles[i +1])){return true;}
+    else if(i < (end-1) && !farRightCol && q ==(tiles[i +1])){return true;}
     //Check  bottom left corner
-    else if (i < (end-width) && !farLeftCol && checkIfMine(tiles[i -1 +width])){return true;}
+    else if (i < (end-width) && !farLeftCol && q ==(tiles[i -1 +width])){return true;}
     //Check bottom right corner
-    else if(i<(end-width-1) && !farRightCol && checkIfMine(tiles[i +1 +width])){return true;}
+    else if(i<(end-width-1) && !farRightCol && q==(tiles[i +1 +width])){return true;}
     //Check below
-    else if(i <(end-width) && checkIfMine(tiles[i + width])){return true;}
+    else if(i <(end-width) && q==(tiles[i + width])){return true;}
     
     else {return false;}
+}
     //-------------------------------
     // if (i > 0 && !farLeftCol && checkIfMine(tiles[i -1])) {return true;}
     // // Check top right corner
@@ -223,7 +259,7 @@ function isAdjacent(mainIdx,questionIdx){ // parameter i: index of exploding til
     // else if(i <(end-width) && checkIfMine(tiles[i + width])){return true;}
     
     // else {return false;}
-}
+
 
 function setTileCountClass(tile) {
             let minesAround = tile.getAttribute("data-count")
